@@ -1,5 +1,6 @@
 import unittest
 import helper
+import numpy as np
 
 class HelperTests(unittest.TestCase):
     def test_ncc(self):
@@ -12,3 +13,9 @@ class HelperTests(unittest.TestCase):
         x = [202, 27, 162, 71, 151, 175, 153, 35, 65, 200, 40, 56, 59, 83, 70, 123, 175, 280, 251,
              94, 51, 65, 210, 104, 173, 92, 368, 82, 78, 278, 34, 63]
         self.assertEqual(round(ncc(x, y), 4) == 0.0970)
+
+    def test_compute_epanechnikov_kernel(self):
+        desired_kernel = np.array([[0.99184992, 0.9992284, 0.99184992, 0.92283951]
+                                  [0.99184992, 0.9992284, 0.99184992, 0.92283951]
+                                  [0.90234375, 0.9375, 0.90234375, 0.75]])
+        np.testing.assert_almost_equal(compute_epanechnikov_kernel(3, 4), desired_kernel)
