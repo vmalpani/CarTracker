@@ -7,6 +7,7 @@ import helper
 def get_template_histogram(img, (x, y, w, h)):
     car_template = img[y:y+h, x:x+w]
 
+
 def main():
     input_image = cv2.imread('data/00000001.jpg')
     bbox = [6, 166, 43, 27]
@@ -15,4 +16,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
