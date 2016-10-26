@@ -8,7 +8,7 @@ import helper
 
 def generate_histogram(quantized_img, (x, y, w, h), bins=32):
     template = quantized_img[y:y+h, x:x+w]
-    car_hist, _ = np.histogram(template.flatten(), bins=bins, range=(0, bins))
+    car_hist = cv2.calcHist([template],[0],None,[bins],[0, bins])
     car_hist = car_hist.astype(float) / np.sum(car_hist)
     return car_hist
 
