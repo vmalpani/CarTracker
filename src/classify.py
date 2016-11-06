@@ -61,7 +61,7 @@ def load_image(image_fh, color=True):
 def is_overlap((left1, top1, width1, height1), (left2, top2, width2, height2)):
     right1 = left1 + width1
     bottom1 = top1 + height1
- 
+
     right2 = left2 + width2
     bottom2 = top2 + height2
 
@@ -96,7 +96,7 @@ def prun_region_proposals(region, search_window, check_overlap):
         return False
 
     if check_overlap:
-    	if not is_overlap(rect, search_window):
+        if not is_overlap(rect, search_window):
             return False
 
     if rect[2] / float(rect[3]) > 0.25 and \
@@ -222,7 +222,7 @@ if __name__ == '__main__':
         img = cv2.imread(fname)
         if img is not None:
             t1 = time.time()
-            (best_bbox, max_prob) = pred.generate_predictions(img, search_window)
+            (best_bbox, max_prob) = pred.generate_predictions(img, search_window)  # noqa
             print best_bbox, max_prob
             if best_bbox:
                 print time.time() - t1
