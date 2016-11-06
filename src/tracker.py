@@ -4,19 +4,46 @@ import numpy as np
 import cv2
 
 import helper
+import selectivesearch
 
 
-def generate_histogram(quantized_img, (x, y, w, h), bins=32):
-    template = quantized_img[y:y+h, x:x+w]
+def get_region_proposals(img):
+    img_lbl, regions = selectivesearch.selective_search(img, scale=500, sigma=0.9, min_size=10)
+    clone = img.copy()
+    pruned_regions = []
+    for r in regions:
+        rect = r['rect']
+        if rect[2] == 0 or rect[3] == 0:
+            continue
+        if ((rect[2] / float(rect[3])) > 0.25 and (rect[2] / float(rect[3])) < 0.75) or ((rect[3] / float(rect[2])) > 0.25 and (rect[3] / float(rect[2])) < 0.75):
+            if((rect[2] * float(rect[3])) > 500 and (rect[2] * float(rect[3])) < 50000):
+                pruned_regions.append(rect)
+                cv2.rectangle(clone, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 2)
+    cv2.imshow("sliding window visualizer", clone)
+
+
+def generate_histogram(img, (x, y, w, h), bins=32, use_kernel=False):
+    template = img[y:y+h, x:x+w]
+    if use_kernel:
+        normalized = template / float(bins)
+        kernel = helper.compute_epanechnikov_kernel(h, w)
+        normalized[:,:,0] *= kernel
+        normalized[:,:,1] *= kernel
+        normalized[:,:,2] *= kernel
+        template = normalized * float(bins)
+    # import pdb
+    # pdb.set_trace()
     car_hist = cv2.calcHist([template],[0],None,[bins],[0, bins])
     car_hist = car_hist.astype(float) / np.sum(car_hist)
+
     return car_hist
 
 
 def generate_hog_features(img, (x, y, w, h)):
     hog = cv2.HOGDescriptor()
     car_template = img[y:y+h, x:x+w]
-    car_features = hog.compute(np.uint8(car_template))
+    resized_image = cv2.resize(car_template, (64, 128))
+    car_features = hog.compute(np.uint8(resized_image))
     return car_features
 
 
@@ -46,6 +73,7 @@ def main():
     # first_img = helper.median_filtering(first_img)
     quantized_img = first_img // 32
     car_hist = generate_histogram(quantized_img, bbox)
+    # car_hist = generate_hog_features(first_img, bbox)
 
     for img in images[1:]:
         test_img = cv2.imread(img)
@@ -62,8 +90,20 @@ def main():
                                                         search_window,
                                                         stride=8,
                                                         template_size=(bbox[2], bbox[3])):  # noqa
+            """
+            import pdb
+            pdb.set_trace()
+            normalized_window = window / 255.0
+            kernel = helper.compute_epanechnikov_kernel(bbox[3], bbox[2])
+            normalized_window[:,:,0] *= kernel
+            normalized_window[:,:,1] *= kernel
+            normalized_window[:,:,2] *= kernel
+            new_window = normalized_window * 255.0
+            """
             tmp_histogram = generate_histogram(quantized_img,
-                                               (x, y, bbox[2], bbox[3]))
+                                               (x, y, bbox[2], bbox[3]), use_kernel=False)
+            #tmp_histogram = generate_hog_features(test_img,
+            #                                   (x, y, bbox[2], bbox[3]))
             ncc_score = helper.ncc(tmp_histogram, car_hist)
             candidate_windows.append((x, y, bbox[2], bbox[3]))
             candidate_scores.append(ncc_score)
