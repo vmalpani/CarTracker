@@ -205,7 +205,7 @@ def main():
     # [6, 166, 43, 27] - ground truth location of car in first frame
     search_window = helper.expand_search_window(first_img, [6, 166, 43, 27],
                                                 SEARCH_WINDOW_SIZE)
-    for fname in images[1:5]:
+    for fname in images[1:]:
         img = cv2.imread(fname)
         if img is not None:
             t1 = time.time()
