@@ -16,6 +16,7 @@ PRETRAINED = 'model/cifar10_full_iter_70000.caffemodel.h5'
 MODEL_FILE = 'model/cifar10_quick.prototxt'
 LABELS = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog',
           'horse', 'ship', 'truck']
+RESULT_DIR = 'result_detection'
 CHUNK_SIZE = 30
 SEARCH_WINDOW_SIZE = 90
 
@@ -188,15 +189,16 @@ def main():
     """main driver function"""
 
     # create results directory if not already
-    if not os.path.exists('result_detection'):
-        os.makedirs('result_detection')
+    if not os.path.exists(RESULT_DIR):
+        os.makedirs(RESULT_DIR)
 
     pred = Predictions()
     images = sorted(glob.glob('data/*.jpg'))
 
     # take first image and ground truth bbox
     first_img = cv2.imread(images[0])
-
+    helper.draw_bbox(os.path.join(RESULT_DIR, "00000001.jpg"), first_img,
+                     [6, 166, 43, 27])
     # defines search window for the next frame
     # based on car's location in current frame
     # [6, 166, 43, 27] - ground truth location of car in first frame
@@ -212,7 +214,7 @@ def main():
             print time.time() - t1
             if best_bbox:
                 # if valid bbox found, draw and write to disk
-                helper.draw_bbox('result_detection/' + fname.split('/')[-1],
+                helper.draw_bbox(os.path.join(RESULT_DIR, fname.split('/')[-1]),  # noqa
                                  img, best_bbox)
                 # define search window for next frame
                 search_window = helper.expand_search_window(img, best_bbox,
