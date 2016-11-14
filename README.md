@@ -22,4 +22,5 @@ Two future additions include:
 2. Weighing candidate templates with the distance from best detections in the last k frames
 
 Time Estimates: Running this code on a macbook pro with 3GHz i7 processor and 16GB RAM takes ~2s per frame.
+
 Note, if you have access to gpus and caffe compiled accordingly, setting caffe.set_mode_gpu() in Predictions._generate_net will give you considerable speedup.
