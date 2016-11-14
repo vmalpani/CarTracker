@@ -119,7 +119,7 @@ class Predictions:
         # add class probabilities of automobiles and trucks
         # out['prob'][:, 1] += out['prob'][:, 9]
 
-        max_idx = out['prob'][:, 1].argmax()
+        max_idx = out['prob'][:, 1].argsort()[::-1][0]
         prob_automobile = out['prob'][:, 1][max_idx]
         if prob_automobile > max_prob:
             max_prob = prob_automobile
@@ -179,7 +179,8 @@ class Predictions:
         # forward pass on the last batch
         if len(rects) > 0:
             max_prob, best_bbox = self._do_forward_pass(inputs[:len(rects)],
-                                                        rects, max_prob,
+                                                        rects,
+                                                        max_prob,
                                                         best_bbox)
 
         return (best_bbox, max_prob)
@@ -198,7 +199,7 @@ def main():
     # take first image and ground truth bbox
     first_img = cv2.imread(images[0])
     helper.draw_bbox(os.path.join(RESULT_DIR, "00000001.jpg"), first_img,
-                     [6, 166, 43, 27])
+                     [[6, 166, 43, 27]])
     # defines search window for the next frame
     # based on car's location in current frame
     # [6, 166, 43, 27] - ground truth location of car in first frame
@@ -210,12 +211,12 @@ def main():
             t1 = time.time()
             # takes about 2-2.5s per image using cpu mode on macbook pro
             (best_bbox, max_prob) = pred.generate_predictions(img, search_window)  # noqa
-            print best_bbox, max_prob
-            print time.time() - t1
+            # print best_bbox, max_prob
+            # print time.time() - t1
             if best_bbox:
                 # if valid bbox found, draw and write to disk
                 helper.draw_bbox(os.path.join(RESULT_DIR, fname.split('/')[-1]),  # noqa
-                                 img, best_bbox)
+                                 img, [best_bbox])
                 # define search window for next frame
                 search_window = helper.expand_search_window(img, best_bbox,
                                                             SEARCH_WINDOW_SIZE)
