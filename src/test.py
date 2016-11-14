@@ -2,6 +2,7 @@ import unittest
 import helper as hp
 import classify as cl
 import numpy as np
+import tracker as tk
 import cv2
 
 
@@ -88,6 +89,18 @@ class ClassifyTests(unittest.TestCase):
 
         region = {'rect': (1, 1, 5, 10), 'size': 5000}
         self.assertTrue(cl._prun_region_proposals((0, 0, 100, 100), region))
+
+
+class TrackerTests(unittest.TestCase):
+
+    def test_generate_histogram(self):
+        first_img = cv2.imread('data/00000001.jpg')
+        quantized_img = first_img // 32
+        expected_hist = [[0.0], [0.0], [0.0], [0.0], [0.0], [0.625], [0.375], [0.0]]  # noqa
+        actual_hist = tk.generate_histogram(quantized_img,
+                                            (16, 16, 4, 4),
+                                            bins=8)
+        self.assertEqual(actual_hist.tolist(), expected_hist)
 
 
 def main():
