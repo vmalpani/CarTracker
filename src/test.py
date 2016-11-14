@@ -22,14 +22,29 @@ class HelperTests(unittest.TestCase):
         self.assertEqual(round(hp.ncc(x, y), 4), 0.0970)
 
     def test_compute_epanechnikov_kernel(self):
-        desired_kernel = [[0.9918499228395061, 0.9992283950617284,
-                           0.9918499228395061, 0.9228395061728395],
-                          [0.9918499228395061, 0.9992283950617284,
-                           0.9918499228395061, 0.9228395061728395],
-                          [0.90234375, 0.9375, 0.90234375, 0.75]]
+        expected_kernel = [[0.9918499228395061, 0.9992283950617284,
+                            0.9918499228395061, 0.9228395061728395],
+                           [0.9918499228395061, 0.9992283950617284,
+                            0.9918499228395061, 0.9228395061728395],
+                           [0.90234375, 0.9375, 0.90234375, 0.75]]
         actual_kernel = hp.compute_epanechnikov_kernel(3, 4).tolist()
         np.testing.assert_almost_equal(actual_kernel,
-                                       desired_kernel)
+                                       expected_kernel)
+
+    def test_expand_search_window(self):
+        expected_window = [15, 15, 120, 120]
+        actual_window = list(hp.expand_search_window(np.zeros((200, 200)),
+                                                     (50, 50, 50, 50)))
+        self.assertEqual(actual_window, expected_window)
+
+    def test_sliding_window(self):
+        expected_window_coords = [[50, 50], [75, 50], [50, 75], [75, 75]]
+        actual_window_coords = []
+        for item in list(hp.sliding_window(np.zeros((200, 200)),
+                                           (50, 50, 50, 50), 25,
+                                           (10, 10))):
+            actual_window_coords.append([item[0], item[1]])
+        self.assertEqual(actual_window_coords, expected_window_coords)
 
 
 class ClassifyTests(unittest.TestCase):
