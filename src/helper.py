@@ -82,9 +82,11 @@ def compute_epanechnikov_kernel(ht, wt):
     return kernel
 
 
-def draw_bbox(fname, image, (x, y, w, h)):
+def draw_bbox(fname, image, bboxs):
     """draws bbox on image and writes it to disk"""
-    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+    bboxs = [box for box in bboxs if box]
+    for (x, y, w, h) in bboxs:
+        cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
     cv2.imwrite(fname, image)
 
 
