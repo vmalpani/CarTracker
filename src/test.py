@@ -17,11 +17,21 @@ class HelperTests(unittest.TestCase):
         x = [202, 27, 162, 71, 151, 175, 153, 35, 65, 200, 40, 56, 59, 83,
              70, 123, 175, 280, 251, 94, 51, 65, 210, 104, 173, 92, 368, 82,
              78, 278, 34, 63]
-        self.assertEqual(round(hp.ncc(x, y), 4) == 0.0970)
+        self.assertEqual(round(hp.ncc(x, y), 4), 0.0970)
 
     def test_compute_epanechnikov_kernel(self):
-        desired_kernel = np.array([[0.9918499, 0.999228, 0.9918499, 0.9228395]
-                                   [0.9918499, 0.999228, 0.9918499, 0.9228395]
-                                   [0.90234375, 0.9375, 0.90234375, 0.75]])
-        np.testing.assert_almost_equal(hp.compute_epanechnikov_kernel(3, 4),
+        desired_kernel = [[0.9918499228395061, 0.9992283950617284,
+                           0.9918499228395061, 0.9228395061728395],
+                          [0.9918499228395061, 0.9992283950617284,
+                           0.9918499228395061, 0.9228395061728395],
+                          [0.90234375, 0.9375, 0.90234375, 0.75]]
+        actual_kernel = hp.compute_epanechnikov_kernel(3, 4).tolist()
+        np.testing.assert_almost_equal(actual_kernel,
                                        desired_kernel)
+
+
+def main():
+    unittest.main()
+
+if __name__ == '__main__':
+    main()
