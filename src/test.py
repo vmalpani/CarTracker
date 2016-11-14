@@ -1,6 +1,8 @@
 import unittest
 import helper as hp
+import classify as cl
 import numpy as np
+import cv2
 
 
 class HelperTests(unittest.TestCase):
@@ -28,6 +30,49 @@ class HelperTests(unittest.TestCase):
         actual_kernel = hp.compute_epanechnikov_kernel(3, 4).tolist()
         np.testing.assert_almost_equal(actual_kernel,
                                        desired_kernel)
+
+
+class ClassifyTests(unittest.TestCase):
+
+    def test_generate_predictions(self):
+        pred = cl.Predictions()
+        first_img = cv2.imread('data/00000001.jpg')
+        expected_pred = [0, 0, 133, 63]
+        actual_pred = list(pred.generate_predictions(first_img,
+                                                     [0, 0,
+                                                      first_img.shape[0],
+                                                      first_img.shape[1]])[0])
+        self.assertEqual(actual_pred, expected_pred)
+
+    def test_is_overlap(self):
+        rect1 = (11, 11, 24, 24)
+        rect2 = (10, 11, 20, 20)
+        self.assertTrue(cl._is_overlap(rect1, rect2))
+
+        rect3 = (40, 42, 20, 20)
+        self.assertFalse(cl._is_overlap(rect1, rect3))
+
+    def test_prun_image_regions(self):
+        region = {'rect': (1, 1, 1, 1), 'size': 500000}
+        self.assertFalse(cl._prun_region_proposals((0, 0, 100, 100), region))
+
+        region = {'rect': (1, 1, 1, 1), 'size': 5}
+        self.assertFalse(cl._prun_region_proposals((0, 0, 100, 100), region))
+
+        region = {'rect': (1, 1, 1, 0), 'size': 5000}
+        self.assertFalse(cl._prun_region_proposals((0, 0, 100, 100), region))
+
+        region = {'rect': (1, 1, 0, 1), 'size': 5000}
+        self.assertFalse(cl._prun_region_proposals((0, 0, 100, 100), region))
+
+        region = {'rect': (1, 1, 100000, 1), 'size': 5000}
+        self.assertFalse(cl._prun_region_proposals((0, 0, 100, 100), region))
+
+        region = {'rect': (1, 1, 1, 100000), 'size': 5000}
+        self.assertFalse(cl._prun_region_proposals((0, 0, 100, 100), region))
+
+        region = {'rect': (1, 1, 5, 10), 'size': 5000}
+        self.assertTrue(cl._prun_region_proposals((0, 0, 100, 100), region))
 
 
 def main():
