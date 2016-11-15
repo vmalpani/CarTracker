@@ -14,6 +14,12 @@ So, histogram constructed from the first frame is not robust enough.
 ```
 python src/classify.py
 ```
+
+3. To run unit tests:
+```
+python src/test.py
+```
+
 We use cifar10 model trained with caffe for generating predictions. This approach tends to work reasonably well. 
 
 Two future additions include:
